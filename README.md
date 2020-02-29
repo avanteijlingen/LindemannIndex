@@ -1,5 +1,5 @@
 # Lindemann Index
- Calculates the Lindemann index at each step in a GROMACS trajectory (xtc) file.
+ Calculates the Lindemann index of an xyz file or over each step in a GROMACS trajectory (xtc) file according to:
 
 
 

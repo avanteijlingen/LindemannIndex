@@ -12,19 +12,28 @@ import matplotlib.pyplot as plt
 
 import MDAnalysis
 
-def calcindex(positions):
+def calcindex(positions, distances):
+    square_average = 0
+    for a in distances:
+        square_average += a**2                                #<rij2>
+    square_average = square_average / positions.shape[0]
+    average = np.sum(distances)/distances.shape[0]
+    average_squared = average ** 2                            #<rij>2
+    RMS = square_average - average_squared
+    RMS = np.sqrt(RMS)
+    right = RMS/average
+    left = 2 / (positions.shape[0] * (positions.shape[0] - 1))
+    Lindex = left * right
+    return Lindex
+
+def CalculateXYZ(xyzfilepath):
     pass
 
-if __name__ == "__main__":
-    xtc = MDAnalysis.coordinates.XTC.XTCReader("../gromacs/traj_comp.xtc")
-    #xyz = np.ndarray((xtc.n_frames, 3), dtype=np.float32)
+def CalculateOverTraj(xtcfilepath, verbose=False):
+    xtc = MDAnalysis.coordinates.XTC.XTCReader(xtcfilepath)
     i=0
-    #indexes = np.ndarray((xtc.n_frames-1, 2))
-    to = 5000
-    indexes = np.zeros((3000,2))
+    indexes = np.ndarray((xtc.n_frames, 1))
     for ts in xtc:
-        if ts.frame < 2000:
-            continue
         atom1, atom2 = 0, 1
         distances = np.ndarray((int(((ts.positions.shape[0]-1)*(ts.positions.shape[0]))/2),))
         i=0
@@ -39,26 +48,14 @@ if __name__ == "__main__":
                 i+=1
             atom1 += 1
             atom2 = atom1 + 1
-            
-        square_average = 0
-        for a in distances:
-            square_average += a**2                                #<rij2>
-        square_average = square_average / ts.positions.shape[0]
-        average = np.sum(distances)/distances.shape[0]
-        average_squared = average ** 2                            #<rij>2
-        RMS = square_average - average_squared
-        RMS = np.sqrt(RMS)
-        right = RMS/average
-        left = 2 / (ts.positions.shape[0] * (ts.positions.shape[0] - 1))
-        LindemannIndex = left * right
-        
-        indexes[ts.frame-2000] = [ts.frame-2000, LindemannIndex]
-        #print(LindemannIndex, indexes[ts.frame])
-        if ts.frame == to-1:
-            break
-    
-plt.plot(indexes[:,0], indexes[:,1])
-plt.xlabel("Time (ns)")
+
+        Lindex = calcindex(ts.positions, distances)
+        indexes[ts.frame] = Lindex
+        print(Lindex, indexes[ts.frame])
+    return indexes
+
+Lindexes = CalculateOverTraj("../gromacs/traj_comp.xtc")
+plt.plot([x/2 for x in range(0,200)], Lindexes)
+plt.xlabel("Temperature (K)")
 plt.ylabel("Lindemann Index")
-#plt.yscale("log")
-plt.title("100 Argon atoms undergoing heating")
+plt.title("887 Argon atoms undergoing heating")
