@@ -11,10 +11,9 @@ import MDAnalysis
 def calc_xtc(path):
     xtc = MDAnalysis.coordinates.XTC.XTCReader(path)
     xyz = []
-    i=0
     for ts in xtc: #we really only need the first and last
-       print(i, int(xtc.n_frames))
-       print("time:", int(ts.frame), 'ns')
+       print(xtc.frame, int(xtc.n_frames))
+       print("time:", int(ts.dt * xtc.frame), 'ps')
        for coord in ts.positions:
            xyz.append([float(coord[0]), float(coord[1]), float(coord[2])])
     #print(xyz)
