@@ -7,19 +7,16 @@ Created on Thu Feb 27 15:46:59 2020
 
 import numpy as np
 import MDAnalysis
+from scipy.spatial.distance import cdist 
 
-def calc_xtc(path):
-    xtc = MDAnalysis.coordinates.XTC.XTCReader(path)
-    xyz = []
-    for ts in xtc: #we really only need the first and last
-       print(xtc.frame, int(xtc.n_frames))
-       print("time:", int(ts.dt * xtc.frame), 'ps')
-       for coord in ts.positions:
-           xyz.append([float(coord[0]), float(coord[1]), float(coord[2])])
-    #print(xyz)
-    a="""LindemannIndex = self.calculator.calcindex(xyz, len(ts.positions))
-    csv.write("{},{}\n".format(int(ts.frame), LindemannIndex))
-    csv.flush()
-    print((int(ts.frame), LindemannIndex))
-    i+= 1
-    frame +=1"""
+
+def calc_over_time(u, name):
+    mols_of_interest = u.select_atoms("name "+name)
+    times = np.ndarray((u.trajectory.n_frames,), dtype=np.float16)
+    LindemannIndexes = []
+    i = 0
+    for ts in u.trajectory:
+        times[i] = ts.time
+        x = cdist(mols_of_interest.positions, mols_of_interest.positions)
+        print(mols_of_interest.positions.shape)
+    return x

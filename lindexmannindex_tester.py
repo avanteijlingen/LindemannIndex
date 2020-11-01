@@ -8,9 +8,16 @@ import numpy as np
 import lindemannindex as li
 import matplotlib.pyplot as plt
 
-#li.calc_xtc("../gromacs/traj_comp.xtc")
+#li.calc_xtc("")
 
 import MDAnalysis
+
+u = MDAnalysis.Universe("../gromacs/AA/AA_min.gro", "../gromacs/AA/AA_eq.xtc")
+
+cd = li.calc_over_time(u, "AA_A")
+print(cd)
+
+a="""
 
 def calcindex(positions, distances):
     square_average = 0
@@ -54,8 +61,9 @@ def CalculateOverTraj(xtcfilepath, verbose=False):
         print(Lindex, indexes[ts.frame])
     return indexes
 
-Lindexes = CalculateOverTraj("../gromacs/traj_comp.xtc")
-plt.plot([x/2 for x in range(0,200)], Lindexes)
-plt.xlabel("Temperature (K)")
-plt.ylabel("Lindemann Index")
-plt.title("887 Argon atoms undergoing heating")
+#Lindexes = CalculateOverTraj("../gromacs/traj_comp.xtc")
+#plt.plot([x/2 for x in range(0,200)], Lindexes)
+#plt.xlabel("Temperature (K)")
+#plt.ylabel("Lindemann Index")
+#plt.title("887 Argon atoms undergoing heating")
+    """
